@@ -75,7 +75,7 @@ exclude = '''
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-vv --cov='.'"
+addopts = "-v --cov='.'"
 testpaths = ["tests"]
 
 [tool.coverage.run]

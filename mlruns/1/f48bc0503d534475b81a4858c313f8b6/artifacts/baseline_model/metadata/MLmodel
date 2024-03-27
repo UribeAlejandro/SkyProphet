@@ -1,0 +1,31 @@
+artifact_path: baseline_model
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.2
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.4.1.post1
+mlflow_version: 2.11.3
+model_size_bytes: 457
+model_uuid: 0e04a97c04c44c1d82f85a385d5f2bf6
+run_id: f48bc0503d534475b81a4858c313f8b6
+signature:
+  inputs: '[{"type": "boolean", "name": "OPERA_Latin American Wings", "required":
+    true}, {"type": "boolean", "name": "MES_7", "required": true}, {"type": "boolean",
+    "name": "MES_10", "required": true}, {"type": "boolean", "name": "OPERA_Grupo
+    LATAM", "required": true}, {"type": "boolean", "name": "MES_12", "required": true},
+    {"type": "boolean", "name": "TIPOVUELO_I", "required": true}, {"type": "boolean",
+    "name": "MES_4", "required": true}, {"type": "boolean", "name": "MES_11", "required":
+    true}, {"type": "boolean", "name": "OPERA_Sky Airline", "required": true}, {"type":
+    "boolean", "name": "OPERA_Copa Air", "required": true}]'
+  outputs: '[{"type": "long", "name": "delay", "required": true}]'
+  params: null
+utc_time_created: '2024-03-27 21:18:34.318133'
