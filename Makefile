@@ -27,8 +27,8 @@ STRESS_URL = http://127.0.0.1:8000
 .PHONY: stress-test
 stress-test:
 	# change stress url to your deployed app
-	mkdir reports || true
-	locust -f tests/stress/api_stress.py --print-stats --html reports/stress-test.html --run-time 60s --headless --users 100 --spawn-rate 1 -H $(STRESS_URL)
+	mkdir -p reports/stress || true
+	locust -f tests/stress/api_stress.py --print-stats --html reports/stress/index.html --run-time 60s --headless --users 100 --spawn-rate 10 -H $(STRESS_URL)
 
 .PHONY: model-test
 model-test:			## Run tests and coverage
@@ -37,7 +37,7 @@ model-test:			## Run tests and coverage
 
 .PHONY: api-test
 api-test:			## Run tests and coverage
-	mkdir reports || true
+	mkdir -p reports/coverage || true
 	pytest --cov=challenge tests/api
 
 .PHONY: build

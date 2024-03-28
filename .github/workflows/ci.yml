@@ -53,9 +53,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-test.txt
 
-      - name: Test with pytest & generate coverage report
+      - name: Test with pytest
         run: |
-          pytest
+          make api-test
 
       - name: Carry out stress-test
         run: |
@@ -90,7 +90,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          path: '.'
+          path: './reports'
 
       - name: Deploy to GitHub Pages
         id: deployment

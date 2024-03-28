@@ -75,7 +75,7 @@ exclude = '''
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "--cov-config=.coveragerc --cov-report term --cov-report html:reports/html --cov-report xml:reports/coverage.xml --junitxml=reports/junit.xml -p no:warnings"
+addopts = "--cov-report html:reports/coverage --cov-report xml:reports/coverage/coverage.xml --junitxml=reports/coverage/junit.xml -p no:warnings"
 testpaths = ["tests"]
 
 [tool.coverage.run]

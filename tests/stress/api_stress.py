@@ -2,7 +2,7 @@ from locust import HttpUser, task
 
 
 class StressUser(HttpUser):
-    @task
+    @task(5)
     def predict_argentinas(self):
         self.client.post(
             "/predict",
@@ -19,7 +19,7 @@ class StressUser(HttpUser):
             },
         )
 
-    @task
+    @task(5)
     def predict_latam(self):
         self.client.post(
             "/predict",
@@ -35,3 +35,7 @@ class StressUser(HttpUser):
                 ]
             },
         )
+
+    @task(1)
+    def check_health(self):
+        self.client.get("/health")

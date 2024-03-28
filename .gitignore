@@ -1,6 +1,7 @@
 # Other
 mlruns/
-reports/
+reports/coverage
+reports/stress
 *.h2
 *.pkl
 
