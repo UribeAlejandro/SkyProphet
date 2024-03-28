@@ -1,13 +1,28 @@
-import fastapi
+import logging
 
-app = fastapi.FastAPI()
+from fastapi import FastAPI
+
+from challenge.routes import health, inference
+
+log = logging.getLogger("uvicorn")
 
 
-@app.get("/health", status_code=200)
-async def get_health() -> dict:
-    return {"status": "OK"}
+def create_application() -> FastAPI:
+    application = FastAPI()
+    application.include_router(health.router, tags=["health"])
+    application.include_router(inference.router, tags=["inference"])
+
+    return application
 
 
-@app.post("/predict", status_code=200)
-async def post_predict() -> dict:
-    return {}
+app = create_application()
+
+
+@app.on_event("startup")
+async def startup_event():
+    log.info("Starting up...")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    log.info("Shutting down...")

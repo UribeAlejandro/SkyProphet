@@ -10,29 +10,110 @@ class TestBatchPipeline(unittest.TestCase):
         self.client = TestClient(app)
 
     def test_should_get_predict(self):
-        data = {"flights": [{"OPERA": "Aerolineas Argentinas", "TIPOVUELO": "N", "MES": 3}]}
-        # when("xgboost.XGBClassifier").predict(ANY).thenReturn(np.array([0]))
-        # change this line to the model of chosing
+        data = {
+            "flights": [
+                {
+                    "OPERA": "Aerolineas Argentinas",
+                    "TIPOVUELO": "N",
+                    "MES": 3,
+                    "SIGLADES": "Buenos Aires",
+                    "DIANOM": "Domingo",
+                }
+            ]
+        }
+
         response = self.client.post("/predict", json=data)
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"predict": [0]})
 
-    def test_should_failed_unknown_column_1(self):
-        data = {"flights": [{"OPERA": "Aerolineas Argentinas", "TIPOVUELO": "N", "MES": 13}]}
-        # when("xgboost.XGBClassifier").predict(ANY).thenReturn(np.array([0]))
-        # change this line to the model of chosing
+    def test_missing_feature(self):
+        data = {
+            "flights": [
+                {
+                    "OPERA": "Aerolineas Argentinas",
+                    "TIPOVUELO": "N",
+                    "MES": 12,
+                    "SIGLADES": "Buenos Aires",
+                    # Missing DIANOM
+                }
+            ]
+        }
         response = self.client.post("/predict", json=data)
-        self.assertEqual(response.status_code, 400)
 
-    def test_should_failed_unknown_column_2(self):
-        data = {"flights": [{"OPERA": "Aerolineas Argentinas", "TIPOVUELO": "O", "MES": 13}]}
-        # when("xgboost.XGBClassifier").predict(ANY).thenReturn(np.array([0]))
-        # change this line to the model of chosing
-        response = self.client.post("/predict", json=data)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 422)
 
-    def test_should_failed_unknown_column_3(self):
-        data = {"flights": [{"OPERA": "Argentinas", "TIPOVUELO": "O", "MES": 13}]}
+    def test_mes_out_of_range(self):
+        data = {
+            "flights": [
+                {
+                    "OPERA": "Aerolineas Argentinas",
+                    "TIPOVUELO": "N",
+                    "MES": 13,  # Should be between 1 and 12
+                    "SIGLADES": "Buenos Aires",
+                    "DIANOM": "Domingo",
+                }
+            ]
+        }
+
+        response = self.client.post("/predict", json=data)
+
+        self.assertEqual(response.status_code, 422)
+
+    def test_should_failed_unknown_opera(self):
+        data = {
+            "flights": [
+                {"OPERA": "JetSmart", "TIPOVUELO": "N", "MES": 12, "SIGLADES": "Buenos Aires", "DIANOM": "Domingo"}
+            ]
+        }
+
+        response = self.client.post("/predict", json=data)
+        self.assertEqual(response.status_code, 422)
+
+    def test_should_failed_unknown_tipo_vuelo(self):
+        data = {
+            "flights": [
+                {
+                    "OPERA": "Aerolineas Argentinas",
+                    "TIPOVUELO": "O",
+                    "MES": 12,
+                    "SIGLADES": "Buenos Aires",
+                    "DIANOM": "Domingo",
+                }
+            ]
+        }
+
+        response = self.client.post("/predict", json=data)
+        self.assertEqual(response.status_code, 422)
+
+    def test_should_failed_unknown_siglades(self):
+        data = {
+            "flights": [
+                {
+                    "OPERA": "Aerolineas Argentinas",
+                    "TIPOVUELO": "I",
+                    "MES": 12,
+                    "SIGLADES": "Havana",
+                    "DIANOM": "Domingo",
+                }
+            ]
+        }
         # when("xgboost.XGBClassifier").predict(ANY).thenReturn(np.array([0]))
         response = self.client.post("/predict", json=data)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 422)
+
+    def test_should_failed_unknown_dianom(self):
+        data = {
+            "flights": [
+                {
+                    "OPERA": "Aerolineas Argentinas",
+                    "TIPOVUELO": "I",
+                    "MES": 12,
+                    "SIGLADES": "Buenos Aires",
+                    "DIANOM": "Juernes",
+                }
+            ]
+        }
+
+        response = self.client.post("/predict", json=data)
+        self.assertEqual(response.status_code, 422)
