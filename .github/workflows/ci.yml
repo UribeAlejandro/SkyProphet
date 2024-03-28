@@ -2,6 +2,11 @@ name: Continuous Integration
 
 on: [ push ]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   build:
     name: Build
@@ -41,6 +46,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.12
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
