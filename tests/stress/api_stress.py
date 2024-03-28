@@ -1,5 +1,4 @@
 from locust import HttpUser, task
-from tests.constants import data
 
 
 class StressUser(HttpUser):
@@ -17,7 +16,7 @@ class StressUser(HttpUser):
                         "DIANOM": "Jueves",
                     }
                 ]
-            }
+            },
         )
 
     @task
@@ -34,5 +33,5 @@ class StressUser(HttpUser):
                         "DIANOM": "Jueves",
                     }
                 ]
-            }
+            },
         )
