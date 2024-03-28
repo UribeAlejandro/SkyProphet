@@ -1,6 +1,4 @@
-from fastapi import APIRouter, Depends
-
-from challenge.config import Settings, get_settings
+from fastapi import APIRouter
 
 router = APIRouter()
 
@@ -11,5 +9,5 @@ async def get_health() -> dict:
 
 
 @router.get("/ping", status_code=200)
-async def pong(settings: Settings = Depends(get_settings)) -> dict:
-    return {"ping": "pong!", "environment": settings.environment, "testing": settings.testing}
+async def pong() -> dict:
+    return {"ping": "pong!"}

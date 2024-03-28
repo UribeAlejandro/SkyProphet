@@ -33,12 +33,12 @@ stress-test:
 .PHONY: model-test
 model-test:			## Run tests and coverage
 	mkdir reports || true
-	pytest --cov-config=.coveragerc --cov-report term --cov-report html:reports/html --cov-report xml:reports/coverage.xml --junitxml=reports/junit.xml --cov=challenge tests/model
+	pytest --cov=challenge tests/model
 
 .PHONY: api-test
 api-test:			## Run tests and coverage
 	mkdir reports || true
-	pytest --cov-config=.coveragerc --cov-report term --cov-report html:reports/html --cov-report xml:reports/coverage.xml --junitxml=reports/junit.xml --cov=challenge tests/api
+	pytest --cov=challenge tests/api
 
 .PHONY: build
 build:			## Build locally the python artifact
@@ -47,3 +47,9 @@ build:			## Build locally the python artifact
 .PHONY: setup-mlflow
 setup-mlflow:
 	mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns --port 5000
+
+
+SERVER_URL = 0.0.0.0:8000
+.PHONY: run-server
+run-server:
+	gunicorn --bind $(SERVER_URL) challenge.api:app --reload -k uvicorn.workers.UvicornWorker
