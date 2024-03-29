@@ -5,3 +5,6 @@ pre-commit
 python-dotenv
 seaborn==0.13.2
 matplotlib==3.8.3
+google-auth
+google-cloud
+google-cloud-storage

@@ -28,7 +28,7 @@ STRESS_URL = http://127.0.0.1:8000
 stress-test:
 	# change stress url to your deployed app
 	mkdir -p reports/stress || true
-	locust -f tests/stress/api_stress.py --print-stats --html reports/stress/index.html --run-time 60s --headless --users 100 --spawn-rate 10 -H $(STRESS_URL)
+	locust -f tests/stress/api_stress.py --print-stats --html reports/stress/index.html --run-time 5s --headless --users 100 --spawn-rate 10 -H $(STRESS_URL)
 
 .PHONY: model-test
 model-test:			## Run tests and coverage
@@ -43,10 +43,6 @@ api-test:			## Run tests and coverage
 .PHONY: build
 build:			## Build locally the python artifact
 	python setup.py bdist_wheel
-
-.PHONY: setup-mlflow
-setup-mlflow:
-	mlflow server --backend-store-uri sqlite:///database/mlflow.db --default-artifact-root ./mlruns --port 5001 --host 0.0.0.0
 
 
 SERVER_URL = 0.0.0.0:8000
