@@ -38,8 +38,8 @@ line-length = 120
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
-# Assume Python 3.11.
-target-version = "py311"
+# Assume Python 3.12.
+target-version = "py312"
 
 [tool.ruff.mccabe]
 # Unlike Flake8, default to a complexity level of 10.
@@ -57,7 +57,7 @@ line_length = 120
 
 [tool.black]
 line-length = 120
-target-version = ['py311']
+target-version = ['py312']
 include = '\.pyi?$'
 exclude = '''
 /(
@@ -75,7 +75,7 @@ exclude = '''
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-vv --cov='.'"
+addopts = "--cov-report html:reports/coverage --cov-report xml:reports/coverage/coverage.xml --junitxml=reports/coverage/junit.xml -p no:warnings"
 testpaths = ["tests"]
 
 [tool.coverage.run]
@@ -102,6 +102,3 @@ exclude_also = [
     ]
 
 ignore_errors = true
-
-[tool.coverage.html]
-directory = "coverage_html_report"

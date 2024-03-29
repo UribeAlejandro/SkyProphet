@@ -2,10 +2,15 @@ name: Continuous Integration
 
 on: [ push ]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
-    timeout-minutes: 15
 
     steps:
       - name: Checkout repository code
@@ -14,12 +19,13 @@ jobs:
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: 3.12.1
+          python-version: 3.12
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          pip install -r requirements-test.txt
 
       - name: Code quality checks
         run: |
@@ -28,9 +34,8 @@ jobs:
           ruff check .
 
   test:
-    name:
+    name: Test
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     needs: build
 
     steps:
@@ -40,13 +45,25 @@ jobs:
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: 3.12.1
+          python-version: 3.12
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          pip install -r requirements-test.txt
 
       - name: Test with pytest
         run: |
-          pytest -vv -cov="." tests/
+          make api-test
+
+      - name: Carry out stress-test
+        run: |
+          make run-server &
+          make stress-test
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports_folder
+          path: './reports'

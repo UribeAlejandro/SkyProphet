@@ -1,3 +1,11 @@
+# Other
+mlruns/
+reports/coverage
+reports/stress
+*.h2
+*.pkl
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,10 +1,8 @@
 -r requirements.txt
 
-ruff
-black
-black[jupyter]
-isort
-docformatter
-pytest
-pytest-cov
+jupyter
+pre-commit
 commitizen
+shap==0.45.0
+seaborn==0.13.2
+matplotlib==3.8.3
