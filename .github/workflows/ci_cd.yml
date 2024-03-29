@@ -72,11 +72,11 @@ jobs:
 
       - name: Test API
         run: |
-          make test-api
+          make api-test
 
       - name: Test Model
         run: |
-          make test-model
+          make model-test
 
       - name: Carry out stress-test
         run: |
