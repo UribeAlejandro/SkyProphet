@@ -67,33 +67,3 @@ jobs:
         with:
           name: reports_folder
           path: './reports'
-
-  github-pages-deploy:
-    needs: test
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download math result for job 1
-        uses: actions/download-artifact@v4
-        with:
-          name: reports_folder
-
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: './reports'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        shell: bash
-        run: |
-          bash git subtree push --prefix reports origin gh-pages

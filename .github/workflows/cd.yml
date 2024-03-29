@@ -4,6 +4,14 @@ on:
   workflow_run:
     workflows: [Continuous Integration]
     types: [completed]
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   staging:
@@ -33,3 +41,31 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.12
+
+  github-pages-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download math result for job 1
+        uses: actions/download-artifact@v4
+        with:
+          name: reports_folder
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: './reports'
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: reports
