@@ -63,7 +63,7 @@ jobs:
 
       - name: pull DVC
         run: |
-          dvc pull datasets/test
+          dvc pull data
 
       - name: Install dependencies
         run: |
