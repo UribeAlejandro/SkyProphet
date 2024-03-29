@@ -46,7 +46,7 @@ build:			## Build locally the python artifact
 
 .PHONY: setup-mlflow
 setup-mlflow:
-	mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns --port 5000
+	mlflow server --backend-store-uri sqlite:///database/mlflow.db --default-artifact-root ./mlruns --port 5001 --host 0.0.0.0
 
 
 SERVER_URL = 0.0.0.0:8000

@@ -1,0 +1,12 @@
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+RANDOM_STATE = 101
+DUMMY_COLUMNS = ["OPERA", "TIPOVUELO", "MES", "SIGLADES", "DIANOM"]
+THRESHOLD_IN_MINUTES = 15
+MODEL_STAGE = "production"
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
+MLFLOW_EXPERIMENT_NAME = os.getenv("MLFLOW_EXPERIMENT_NAME")

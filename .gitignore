@@ -4,6 +4,7 @@ reports/coverage
 reports/stress
 *.h2
 *.pkl
+*.DS_Store
 
 
 # Byte-compiled / optimized / DLL files
