@@ -54,17 +54,10 @@ jobs:
           python-version: 3.12
           cache: 'pip'
 
-#      - name: Configure GCP credentials
-#        uses: 'google-github-actions/auth@v1'
-#        with:
-#          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
-#
-#      - name: set up DVC
-#        uses: iterative/setup-dvc@v1
-#
-#      - name: pull DVC
-#        run: |
-#          dvc pull data
+      - name: Configure GCP credentials
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 
       - name: Install dependencies
         run: |
