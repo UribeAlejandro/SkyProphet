@@ -1,3 +1,4 @@
+path_data = "data/raw/data.csv"
 data = {
     "flights": [
         {
