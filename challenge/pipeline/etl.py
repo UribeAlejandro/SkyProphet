@@ -26,7 +26,18 @@ def get_period_day(date):
         return "noche"
 
 
-def is_high_season(fecha):
+def is_high_season(fecha: str) -> int:
+    """Check if the date is in high season.
+
+    Parameters
+    ----------
+    fecha : str
+        Date in format "YYYY-MM-DD HH:MM:SS".
+    Returns
+    -------
+    int
+        1 if the date is in high season, 0 otherwise.
+    """
     fecha_anio = int(fecha.split("-")[0])
     fecha = datetime.strptime(fecha, "%Y-%m-%d %H:%M:%S")
     range1_min = datetime.strptime("15-Dec", "%d-%b").replace(year=fecha_anio)
@@ -49,14 +60,38 @@ def is_high_season(fecha):
         return 0
 
 
-def get_min_diff(data: pd.DataFrame):
+def get_min_diff(data: pd.DataFrame) -> float:
+    """Get the difference in minutes between two dates.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Dataframe with columns "Fecha-O" and "Fecha-I".
+    Returns
+    -------
+    float
+        Difference in minutes.
+    """
     fecha_o = datetime.strptime(data["Fecha-O"], "%Y-%m-%d %H:%M:%S")
     fecha_i = datetime.strptime(data["Fecha-I"], "%Y-%m-%d %H:%M:%S")
     min_diff = ((fecha_o - fecha_i).total_seconds()) / 60
     return min_diff
 
 
-def get_rate_from_column(data, column):
+def get_rate_from_column(data: pd.DataFrame, column: str) -> pd.DataFrame:
+    """Get the rate of delays for each category in a column.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Dataframe with the raw data.
+    column: str
+        Column name.
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe with the rate of delays for each category.
+    """
     delays = {}
     for _, row in data.iterrows():
         if row["delay"] == 1:
@@ -131,6 +166,53 @@ def etl_pipeline(data: pd.DataFrame, target_column: Optional[str] = "delay") -> 
         Target.
     """
     data["min_diff"] = data.apply(get_min_diff, axis=1)
-    target = calculate_target(data, target_column)
-    features = transform_categorical(data)
+    features, target = transform_data(data, target_column)
     return features, target
+
+
+def extract_data(data_path: str) -> pd.DataFrame:
+    """Extract data from a CSV file.
+
+    Parameters
+    ----------
+    data_path : str
+        Path to the CSV file.
+    Returns
+    -------
+    pd.DataFrame
+        Raw data.
+    """
+    data = pd.read_csv(data_path)
+    return data
+
+
+def transform_data(data: pd.DataFrame, target_column: str) -> Tuple[pd.DataFrame, pd.Series]:
+    """Transform the raw data.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Raw data.
+    target_column : str
+        Target column name.
+    Returns
+    -------
+    Tuple[pd.DataFrame, pd.Series]
+        Features and target.
+    """
+    features = transform_categorical(data)
+    target = calculate_target(data, target_column)
+    return features, target
+
+
+def load_data(data: pd.DataFrame, output_path: str) -> None:
+    """Load the transformed data.
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        Features.
+    output_path : str
+        Path to save the data.
+    """
+    data.to_csv(output_path, index=False)
