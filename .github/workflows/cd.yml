@@ -10,7 +10,7 @@ env:
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
   MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
   MLFLOW_EXPERIMENT_NAME: ${{ secrets.MLFLOW_EXPERIMENT_NAME }}
-  IMAGE_NAME: $(echo $GITHUB_REPOSITORY | tr '[A-Z]' '[a-z]')/skyprophet
+  IMAGE_NAME: skyprophet
 
 permissions:
   pages: write
@@ -61,7 +61,7 @@ jobs:
         env:
           GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
         run: |-
-          docker tag $IMAGE_NAME:latest us-west2-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
-          docker tag $IMAGE_NAME:latest us-west2-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
-          docker push us-west2-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
-          docker push us-west2-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
+          docker tag $IMAGE_NAME:latest us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
+          docker tag $IMAGE_NAME:latest us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
+          docker push us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
+          docker push us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
