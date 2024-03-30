@@ -4,10 +4,13 @@ on:
   workflow_run:
     workflows: [Continuous Integration]
     types: [completed]
+    branches:
+      - main
 
 
 env:
   IMAGE_NAME: skyprophet
+  GCP_ZONE: us-east1
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
   MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
   MLFLOW_EXPERIMENT_NAME: ${{ secrets.MLFLOW_EXPERIMENT_NAME }}
@@ -21,7 +24,7 @@ jobs:
   staging:
     name: Build & Push Docker Image to GCP
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/main'}}
 
     steps:
       - name: Checkout repository code
@@ -69,7 +72,7 @@ jobs:
   deploy:
     name: Deploy Docker Image to GCP - Cloud Run
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/main'}}
 
     steps:
       - name: Checkout repository code
