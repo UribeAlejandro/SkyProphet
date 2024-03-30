@@ -80,11 +80,11 @@ jobs:
           make run-server &
           make stress-test
 
-      - name: Upload to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-#        if: github.ref == 'refs/heads/main'
+      - name: Upload report artifacts
+        uses: actions/upload-artifact@v2
         with:
-          folder: reports
+          name: test-reports
+          path: reports
 
   staging:
     name: Staging
