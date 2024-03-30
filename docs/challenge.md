@@ -107,19 +107,57 @@ The ETL process consists of the following steps:
 
 ## Model
 
-
 ### Experiments
 
+All the experiments were tracked using `MLFlow`, the tracking server runs in a `GCP VM`, that stores the artifacts (model, confusion matrix, etc) in a `GCP bucket` and the `registry` (metrics, parameters, registered models, etc) in a `PostgreSQL` database that is hosted in `GCP SQL`. A diagram of the architecture is shown below:
 
-#### Tracking
+![Experiments](img/SkyProphet-Experiments.drawio.svg)
 
+#### Tracking & Registry
 
-#### Registry
+The experiments were tracked using `MLFlow`. The tracking server can be started using the following command:
 
+```bash
+mlflow server --backend-store-uri $BACKEND_STORE_URI --default-artifact-root $DEFAULT_ARTIFACT_ROOT  --host 0.0.0 --port 5000
+```
+
+> Note: You should SSH the `GCP VM` to run the command.
 
 #### Serving
 
+The model is served using `FastAPI`. The model can be served using the following command:
 
-## Monitoring
+```bash
+make run-server
+```
+
+The api has the following endpoints:
+
+- `/`: (GET) Greets the user.
+- `/predict`: (POST) Predicts the likelihood of a flight delay.
+- `/docs`: (GET) Shows the documentation of the API.
+- `/health`: (GET) Checks the health of the server.
+- `/ping`: (GET) Pings the server.
+
+## Deployment
+
+The deployment of the project is done using `GitHub Actions`. The deployment process consists of the following steps:
+
+- `Continuous Integration`
+  - `Build`: Install the dependencies & enforces code style.
+  - `Test`: Runs the tests of the project.
+- `Continuous Delivery`
+  - `Staging`: Build the docker image and push it to the `Container Registry` & `Artifact Regidstry`.
+  - `Deploy`: Deploys the created docker image to `GCP Cloud Run` using `Docker`.
+
+## Nice Things to Have
+
+### Monitoring
+
+The monitoring of `SkyProphet` can be done using an adversarial approach. Thus, a second model `adversarial validator` is trained to detect the drift in the data. The architecture of the monitoring system is shown below:
 
 ![Monitoring](img/SkyProphet-Monitoring.drawio.svg)
+
+### CI/CD
+
+The actual `CI/CD` runs in `GitHub Actions`, a demanding task such as the `stress-test` is running there, which is not ideal. Then, would be nice to have a `dev` or `test` environment to carry out all tests and deploy in this environment before deploying to `production`.
