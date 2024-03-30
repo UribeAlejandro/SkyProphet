@@ -1,4 +1,4 @@
-# Sky Prophet
+# Sky Prophet <!-- omit in toc -->
 
 [![Continuous Integration](https://github.com/UribeAlejandro/SkyProphet/actions/workflows/ci.yml/badge.svg)](https://github.com/UribeAlejandro/SkyProphet/actions/workflows/ci.yml)
 
@@ -6,8 +6,23 @@
 
 This project is part of the interviewing process for the position of Machine Learning Engineer. The goal of the project is to build a build, test & serve a Machine Learning model able to predict the likelihood of flight delays.
 
-## Table of Contents
+## Table of Contents <!-- omit in toc -->
 
+- [Architecture](#architecture)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Test](#test)
+- [Data](#data)
+  - [Data Version Control](#data-version-control)
+  - [Extract, transform, load](#extract-transform-load)
+- [Model](#model)
+  - [Experiments](#experiments)
+    - [Tracking \& Registry](#tracking--registry)
+    - [Serving](#serving)
+- [Deployment](#deployment)
+- [Nice Things to Have](#nice-things-to-have)
+  - [Monitoring](#monitoring)
+  - [CI/CD](#cicd)
 
 ## Architecture
 
@@ -40,6 +55,10 @@ docker-compose up -d
 ```
 
 You should be able to access the server at `http://localhost:8000`. The documentation of the API is available at `http://localhost:8000/docs`.
+
+The `/docs` route is shown below:
+
+![Docs](img/FastAPI-Docs.png)
 
 ## Test
 
@@ -113,15 +132,26 @@ All the experiments were tracked using `MLFlow`, the tracking server runs in a `
 
 ![Experiments](img/SkyProphet-Experiments.drawio.svg)
 
-#### Tracking & Registry
-
-The experiments were tracked using `MLFlow`. The tracking server can be started using the following command:
+As mentioned above, were tracked using `MLFlow`. The tracking server can be started using the following command:
 
 ```bash
 mlflow server --backend-store-uri $BACKEND_STORE_URI --default-artifact-root $DEFAULT_ARTIFACT_ROOT  --host 0.0.0 --port 5000
 ```
 
 > Note: You should SSH the `GCP VM` to run the command.
+
+#### Tracking & Registry
+
+The `MLFlow` server allows the data practitioner to track the experiments and register the models. An example of the experiments is shown below:
+
+![Experiments](img/Experiments.png)
+
+Once, the model is trained, it can be registered in the `MLFlow` registry. An example of the registry is shown below:
+
+![Registry](img/Registry.gif)
+
+> **Note**: In this case, `capable-ant-951` has been selected as the best model. Because has the highest `F1-score`, `ROC AUC` & `Recall` .
+
 
 #### Serving
 
@@ -149,6 +179,18 @@ The deployment of the project is done using `GitHub Actions`. The deployment pro
 - `Continuous Delivery`
   - `Staging`: Build the docker image and push it to the `Container Registry` & `Artifact Regidstry`.
   - `Deploy`: Deploys the created docker image to `GCP Cloud Run` using `Docker`.
+
+The deployed application is shown below:
+
+![Deployment](img/SkyProphet-Deployment.drawio.svg)
+
+> **Note:** The model that runs in the `GCP Cloud Run` is the one that has the best performance in the `MLFlow` registry. However, it is not static. Because it is retrieved from the `MLFlow` registry, it can be updated with a new model that has better performance without the need to redeploy the application.
+
+An example of a model promotion is shown below:
+
+![Model Promotion](img/Model-Promoted.png)
+
+> **Note**: The model with the `production` alias is the one that is retrieved by the `GCP Cloud Run`.
 
 ## Nice Things to Have
 
