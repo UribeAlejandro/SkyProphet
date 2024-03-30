@@ -7,6 +7,7 @@ on:
 
 
 env:
+  GCP_ZONE: us-east1
   IMAGE_NAME: skyprophet
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
   MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
@@ -18,7 +19,7 @@ permissions:
   id-token: write
 
 jobs:
-  build-push:
+  staging:
     name: Build & Push Docker Image to GCP
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -46,7 +47,7 @@ jobs:
       - name: Configure Docker Client
         run: |
           gcloud auth configure-docker --quiet
-          gcloud auth configure-docker us-west2-docker.pkg.dev --quiet
+          gcloud auth configure-docker $GCP_ZONE-docker.pkg.dev --quiet
 
       - name: Push Docker Image to Container Registry (GCR)
         env:
@@ -61,7 +62,34 @@ jobs:
         env:
           GIT_TAG: ${{ steps.increment-git-tag.outputs.git-tag }}
         run: |-
-          docker tag $IMAGE_NAME:latest us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
-          docker tag $IMAGE_NAME:latest us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
-          docker push us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
-          docker push us-east1-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
+          docker tag $IMAGE_NAME:latest $GCP_ZONE-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
+          docker tag $IMAGE_NAME:latest $GCP_ZONE-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
+          docker push $GCP_ZONE-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:latest
+          docker push $GCP_ZONE-docker.pkg.dev/$PROJECT_ID/images/$IMAGE_NAME:$GIT_TAG
+
+  deploy:
+    name: Deploy Docker Image to GCP - Cloud Run
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy Docker Image to Cloud Run
+        uses: 'google-github-actions/deploy-cloudrun@v2'
+        with:
+          service: 'sky-prophet'
+          image: 'gcr.io/crested-epoch-399500/skyprophet:latest'
+          env_vars: |
+            PORT=8000
+            MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI
+            MLFLOW_EXPERIMENT_NAME=$MLFLOW_EXPERIMENT_NAME
