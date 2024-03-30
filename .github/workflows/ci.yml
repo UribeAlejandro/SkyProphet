@@ -1,0 +1,62 @@
+name: Continuous Integration
+
+on:
+  push:
+  workflow_dispatch:
+
+env:
+  MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+  MLFLOW_EXPERIMENT_NAME: ${{ secrets.MLFLOW_EXPERIMENT_NAME }}
+
+permissions:
+  pages: write
+  contents: write
+  id-token: write
+
+jobs:
+  setup:
+    name: Setup environment
+    uses: ./.github/workflows/common.yml
+    secrets: inherit
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: setup
+
+    steps:
+      - name: Code quality checks
+        run: |
+          isort --check-only .
+          black --check .
+          ruff check .
+
+  test:
+    name: Test
+    needs: setup
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Pull DVC
+        run: |
+          dvc pull data
+
+      - name: Test API
+        run: |
+          make api-test
+
+      - name: Test Model
+        run: |
+          make model-test
+
+      - name: Carry out stress-test
+        run: |
+          make run-server &
+          make stress-test
+
+      - name: Upload report artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-reports
+          path: reports
