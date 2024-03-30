@@ -162,7 +162,7 @@ The ETL process consists of the following steps:
 
 ### Experiments
 
-All the experiments were tracked using `MLFlow`, the tracking server runs in a `GCP VM`, that stores the artifacts (model, confusion matrix, etc) in a `GCP bucket` and the `registry` (metrics, parameters, registered models, etc) in a `PostgreSQL` database that is hosted in `GCP SQL`. A diagram of the architecture is shown below:
+All the experiments were tracked using `MLFlow`, the tracking server runs in a `GCP VM`, that stores the artifacts (model, confusion matrix, etc) in a `GCP bucket` and the `registry` (metrics, parameters, registered models, etc) in a `PostgreSQL` database that is hosted in `Cloud SQL`. A diagram of the architecture is shown below:
 
 ![Experiments](img/SkyProphet-Experiments.drawio.svg)
 
@@ -218,7 +218,7 @@ The deployed application is shown below:
 
 ![Deployment](img/SkyProphet-Deployment.drawio.svg)
 
-> **Note:** The model that runs in the `GCP Cloud Run` is the one that has the best performance in the `MLFlow` registry. However, it is not static. Because it is retrieved from the `MLFlow` registry, it can be updated with a new model that has better performance without the need to redeploy the application.
+> **Note:** The model that runs in the `GCP Cloud Run` is the one that has the best performance in the `MLFlow` registry. However, it is not static. Because it is retrieved from the `MLFlow` registry, it can be updated with a new model that has better performance without the need to redeploy the application. The good news is: The model retieval is cached, so the performance of the application is not affected!
 
 An example of a model promotion is shown below:
 
