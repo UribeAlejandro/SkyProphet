@@ -30,8 +30,13 @@ jobs:
       - name: Checkout repository code
         uses: actions/checkout@v4
 
-      - name: Setup environment
-        uses: ./.github/actions/common
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
 
       - name: Build Docker image
         run: |
@@ -47,8 +52,13 @@ jobs:
       - name: Checkout repository code
         uses: actions/checkout@v4
 
-      - name: Setup environment
-        uses: ./.github/actions/common
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
 
       - name: Build Docker image
         run: |
