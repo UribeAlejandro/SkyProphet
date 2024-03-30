@@ -31,7 +31,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup environment
-        uses: ./.github/workflows/common.yml
+        uses: ./.github/workflows/common
 
       - name: Build Docker image
         run: |
@@ -48,7 +48,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup environment
-        uses: ./.github/workflows/common.yml
+        uses: ./.github/workflows/common
 
       - name: Build Docker image
         run: |
