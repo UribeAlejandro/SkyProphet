@@ -21,29 +21,31 @@ permissions:
   id-token: write
 
 jobs:
-  setup:
-    name: Setup environment
-    uses: ./.github/workflows/common.yml
-    secrets: inherit
-
   staging:
     name: Staging
-    needs: setup
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
 
     steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
       - name: Build Docker image
+        uses: ./.github/workflows/common.yml
         run: |
           docker build -t skyprophet:latest .
 
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    needs: [staging, setup]
+    needs: staging
     if: ${{ github.event.workflow_run.conclusion == 'failure' || github.event_name == 'workflow_dispatch' }}
 
     steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
       - name: Build Docker image
+        uses: ./.github/workflows/common.yml
         run: |
           docker build -t skyprophet:latest .
