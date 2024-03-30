@@ -92,6 +92,5 @@ jobs:
           service: 'sky-prophet'
           image: gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
           env_vars: |
-            PORT=8000
             MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI
             MLFLOW_EXPERIMENT_NAME=$MLFLOW_EXPERIMENT_NAME
