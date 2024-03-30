@@ -7,7 +7,6 @@ on:
 
 
 env:
-  GCP_ZONE: us-east1
   IMAGE_NAME: skyprophet
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
   MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
@@ -88,8 +87,7 @@ jobs:
         uses: 'google-github-actions/deploy-cloudrun@v2'
         with:
           service: 'sky-prophet'
-          region: $GCP_ZONE
-          image: gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
+          image: gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
           env_vars: |
             PORT=8000
             MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI

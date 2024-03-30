@@ -68,37 +68,28 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Deploy Docker Image to Cloud Run
-        uses: 'google-github-actions/deploy-cloudrun@v2'
-        with:
-          service: 'sky-prophet'
-          image: gcr.io/crested-epoch-399500/skyprophet:latest
-          env_vars: |
-            MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI
-            MLFLOW_EXPERIMENT_NAME=$MLFLOW_EXPERIMENT_NAME
+      - name: Setup DVC
+        uses: iterative/setup-dvc@v1
 
-#      - name: Setup DVC
-#        uses: iterative/setup-dvc@v1
-#
-#      - name: Pull DVC
-#        run: |
-#          dvc pull data
-#
-#      - name: Test API
-#        run: |
-#          make api-test
-#
-#      - name: Test Model
-#        run: |
-#          make model-test
-#
-#      - name: Carry out stress-test
-#        run: |
-#          make run-server &
-#          make stress-test
-#
-#      - name: Upload report artifacts
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: test-reports
-#          path: reports
+      - name: Pull DVC
+        run: |
+          dvc pull data
+
+      - name: Test API
+        run: |
+          make api-test
+
+      - name: Test Model
+        run: |
+          make model-test
+
+      - name: Carry out stress-test
+        run: |
+          make run-server &
+          make stress-test
+
+      - name: Upload report artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-reports
+          path: reports
