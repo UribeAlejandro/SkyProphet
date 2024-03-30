@@ -58,8 +58,8 @@ jobs:
         uses: 'google-github-actions/auth@v1'
         with:
           token_format: access_token
-          workload_identity_provider: ${{ secrets.GCP_PROVIDER }}
-          service_account: ${{ secrets.GCP_SA }}
+          workload_identity_provider: '${{ secrets.GCP_PROVIDER }}'
+          service_account: '${{ secrets.GCP_SA }}'
           export_environment_variables: true
 
       - name: Install dependencies
