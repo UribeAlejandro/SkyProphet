@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup environment
-        uses: ./.github/actions/common
+        uses: ./.github/workflows/common
 
       - name: Code quality checks
         run: |
@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup environment
-        uses: ./.github/actions/common
+        uses: ./.github/workflows/common
 
       - name: Pull DVC
         run: |
