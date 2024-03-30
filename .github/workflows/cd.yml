@@ -89,7 +89,7 @@ jobs:
         with:
           service: 'sky-prophet'
           region: $GCP_ZONE
-          image: 'gcr.io/crested-epoch-399500/skyprophet:latest'
+          image: gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
           env_vars: |
             PORT=8000
             MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI
