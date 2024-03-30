@@ -39,7 +39,7 @@ api-test:		## Run api-tests and coverage
 	mkdir -p reports/coverage || true
 	pytest --cov=challenge tests/api
 
-SERVER_URL = 0.0.0.0:8001
+SERVER_URL = 0.0.0.0:8000
 .PHONY: run-server
 run-server: 		## Run the server
 	gunicorn --bind $(SERVER_URL) challenge.api:app --reload -k uvicorn.workers.UvicornWorker
