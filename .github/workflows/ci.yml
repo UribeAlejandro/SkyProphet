@@ -24,8 +24,10 @@ jobs:
       - name: Checkout repository code
         uses: actions/checkout@v4
 
-      - name: Code quality checks
+      - name: Setup environment
         uses: ./.github/workflows/common.yml
+
+      - name: Code quality checks
         run: |
           isort --check-only .
           black --check .
@@ -39,6 +41,9 @@ jobs:
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v4
+
+      - name: Setup environment
+        uses: ./.github/workflows/common.yml
 
       - name: Pull DVC
         run: |
