@@ -7,10 +7,10 @@ on:
 
 
 env:
+  IMAGE_NAME: skyprophet
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
   MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
   MLFLOW_EXPERIMENT_NAME: ${{ secrets.MLFLOW_EXPERIMENT_NAME }}
-  IMAGE_NAME: skyprophet
 
 permissions:
   pages: write
