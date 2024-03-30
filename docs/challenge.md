@@ -22,6 +22,8 @@ This project is part of the interviewing process for the position of Machine Lea
 - [Deployment](#deployment)
 - [Nice Things to Have](#nice-things-to-have)
   - [Monitoring](#monitoring)
+  - [Feature Store](#feature-store)
+  - [BentoML](#bentoml)
   - [CI/CD](#cicd)
 
 ## Architecture
@@ -29,7 +31,6 @@ This project is part of the interviewing process for the position of Machine Lea
 The architecture of the project is shown below:
 
 ![Architecture](img/SkyProphet-Architecture.drawio.svg)
-
 
 ## Installation
 
@@ -47,10 +48,13 @@ To run the server locally you need to run the following command:
 make run-server
 ```
 
+> **Note:** The following steps require a `.env` file or the environment variables (`MLFLOW_TRACKING_URI`
+and `MLFLOW_EXPERIMENT_NAME`) to be set before running the commands. Otherwise, the commands will fail.
+
 To run the server using docker you need to run the following command:
 
 ```bash
-docker build -t skyprophet .
+docker-compose build
 docker-compose up -d
 ```
 
@@ -59,6 +63,32 @@ You should be able to access the server at `http://localhost:8000`. The document
 The `/docs` route is shown below:
 
 ![Docs](img/FastAPI-Docs.png)
+
+You can access the logs of the server using the following command:
+
+```bash
+docker-compose logs api
+```
+
+You should get an output similar to the following:
+
+```bash
+api-1  | INFO:     Will watch for changes in these directories: ['/']
+api-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+api-1  | INFO:     Started reloader process [1] using StatReload
+api-1  | INFO:     Started server process [8]
+api-1  | INFO:     Waiting for application startup.
+api-1  | INFO:     Starting up...
+api-1  | INFO:     Application startup complete.
+api-1  | INFO:     192.168.65.1:18205 - "GET /docs HTTP/1.1" 200 OK
+api-1  | INFO:     192.168.65.1:18205 - "GET /openapi.json HTTP/1.1" 200 OK
+```
+
+To stop the server you need to run the following command:
+
+```bash
+docker-compose down -v
+```
 
 ## Test
 
@@ -76,6 +106,10 @@ make stress-test
 ```
 
 Once finished you can see the results of the test within the reports' folder. You will find: `reports/coverage/index.html` and `reports/stress/index.html`.
+
+The reports can be downloaded from the `Actions` page of the repo:
+
+![Reports](img/Reports.png)
 
 ## Data
 
@@ -199,6 +233,19 @@ An example of a model promotion is shown below:
 The monitoring of `SkyProphet` can be done using an adversarial approach. Thus, a second model `adversarial validator` is trained to detect the drift in the data. The architecture of the monitoring system is shown below:
 
 ![Monitoring](img/SkyProphet-Monitoring.drawio.svg)
+
+### Feature Store
+
+The model was trained offline and once in production handles online features. It would be nice to have a `Feature Store` to handle the features in production. The workaround that has been implemented partially solves the problem by enforcing the input data to have the same features as the training data. However, it is not ideal because it can get harder to maintain the features in the future.
+
+### BentoML
+
+The model can be served using `BentoML`. This library allows the data practitioner to create a model server that can be deployed in different platforms. It is a grea option because it:
+
+- Make the FastAPI endpoints automatically.
+- Dockerizes the application.
+- Provides the infrastructure as code to depoy the model in different platforms.
+
 
 ### CI/CD
 
