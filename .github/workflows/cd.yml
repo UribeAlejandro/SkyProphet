@@ -91,7 +91,8 @@ jobs:
         uses: 'google-github-actions/deploy-cloudrun@v2'
         with:
           service: 'sky-prophet'
-          image: gcr.io/crested-epoch-399500/skyprophet:latest
+          region: ${{ env.GCP_ZONE }}
+          image: gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
           env_vars: |
-            MLFLOW_TRACKING_URI=$MLFLOW_TRACKING_URI
-            MLFLOW_EXPERIMENT_NAME=$MLFLOW_EXPERIMENT_NAME
+            MLFLOW_TRACKING_URI=${{ env.MLFLOW_TRACKING_URI }}
+            MLFLOW_EXPERIMENT_NAME=${{ env.MLFLOW_EXPERIMENT_NAME }}

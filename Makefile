@@ -2,7 +2,7 @@
 ENV_PREFIX=$(shell python -c "if __import__('pathlib').Path('.venv/bin/pip').exists(): print('.venv/bin/')")
 
 .PHONY: help
-help:             	## Show the help.
+help:			## Show the help.
 	@echo "Usage: make <target>"
 	@echo ""
 	@echo "Targets:"
@@ -25,27 +25,21 @@ install:		## Install dependencies
 
 STRESS_URL = http://127.0.0.1:8000
 .PHONY: stress-test
-stress-test:
-	# change stress url to your deployed app
+stress-test:		## Starts a server & run stress-tests
 	mkdir -p reports/stress || true
 	locust -f tests/stress/api_stress.py --print-stats --html reports/stress/index.html --run-time 60s --headless --users 100 --spawn-rate 10 -H $(STRESS_URL)
 
 .PHONY: model-test
-model-test:			## Run tests and coverage
+model-test:		## Run model-tests and coverage
 	mkdir reports || true
 	pytest --cov=challenge tests/model
 
 .PHONY: api-test
-api-test:			## Run tests and coverage
+api-test:		## Run api-tests and coverage
 	mkdir -p reports/coverage || true
 	pytest --cov=challenge tests/api
 
-.PHONY: build
-build:			## Build locally the python artifact
-	python setup.py bdist_wheel
-
-
 SERVER_URL = 0.0.0.0:8000
 .PHONY: run-server
-run-server:
+run-server: 		## Run the server
 	gunicorn --bind $(SERVER_URL) challenge.api:app --reload -k uvicorn.workers.UvicornWorker
