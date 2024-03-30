@@ -2,14 +2,16 @@ from typing import List, Optional, Tuple, Union
 
 import pandas as pd
 
+from challenge.pipeline.etl import etl_pipeline
+from challenge.pipeline.serving import get_model_from_registry
+
 
 class DelayModel:
     def __init__(self):
-        self._model = None  # Model should be saved in this attribute.
+        self._model = get_model_from_registry()
 
-    def preprocess(
-        self, data: pd.DataFrame, target_column: Optional[str] = None
-    ) -> Union[Tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame]:
+    @staticmethod
+    def preprocess(data: pd.DataFrame, target_column: Optional[str] = None) -> Tuple[pd.DataFrame, pd.Series]:
         """Prepare raw data for training or predict.
 
         Args:
@@ -21,16 +23,18 @@ class DelayModel:
             or
             pd.DataFrame: features.
         """
-        return data
+        features, target = etl_pipeline(data, target_column)
 
-    def fit(self, features: pd.DataFrame, target: pd.DataFrame) -> None:
+        return features, target
+
+    def fit(self, features: pd.DataFrame, target: Union[pd.DataFrame, pd.Series]) -> None:
         """Fit model with preprocessed data.
 
         Args:
             features (pd.DataFrame): preprocessed data.
             target (pd.DataFrame): target.
         """
-        return
+        self._model.fit(features, target)
 
     def predict(self, features: pd.DataFrame) -> List[int]:
         """Predict delays for new flights.
@@ -41,4 +45,10 @@ class DelayModel:
         Returns:
             (List[int]): predicted targets.
         """
-        return features
+        preds = self._model.predict(features)
+        preds = preds.tolist()
+        return preds
+
+    @property
+    def model(self):
+        return self._model

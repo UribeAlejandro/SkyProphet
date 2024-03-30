@@ -44,10 +44,6 @@ api-test:			## Run tests and coverage
 build:			## Build locally the python artifact
 	python setup.py bdist_wheel
 
-.PHONY: setup-mlflow
-setup-mlflow:
-	mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns --port 5000
-
 
 SERVER_URL = 0.0.0.0:8000
 .PHONY: run-server

@@ -2,7 +2,6 @@
 
 jupyter
 pre-commit
-commitizen
-shap==0.45.0
+python-dotenv
 seaborn==0.13.2
 matplotlib==3.8.3

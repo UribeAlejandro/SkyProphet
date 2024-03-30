@@ -1,6 +1,12 @@
 name: Continuous Integration & Continuous Delivery
 
-on: [ push ]
+on:
+  push:
+  workflow_dispatch:
+
+env:
+  MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+  MLFLOW_EXPERIMENT_NAME: ${{ secrets.MLFLOW_EXPERIMENT_NAME }}
 
 permissions:
   pages: write
@@ -48,30 +54,42 @@ jobs:
           python-version: 3.12
           cache: 'pip'
 
+      - name: 'Auth to GCP'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.SERVICE_ACCOUNT_KEY }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-test.txt
 
-      - name: Test with pytest
+      - name: Test API
         run: |
           make api-test
+
+      - name: Test Model
+        run: |
+          make model-test
 
       - name: Carry out stress-test
         run: |
           make run-server &
           make stress-test
 
-      - name: Upload reports
-        uses: actions/upload-artifact@v4
+      - name: Upload report artifacts
+        uses: actions/upload-artifact@v2
         with:
-          name: reports_folder
-          path: './reports'
+          name: test-reports
+          path: reports
 
   staging:
     name: Staging
     runs-on: ubuntu-latest
-    needs: test
+    needs: [build, test]
     if: github.ref == 'refs/heads/main'
 
     steps:
@@ -97,22 +115,3 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.12
-
-  github-pages-deploy:
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: reports_folder
-
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: './reports'
