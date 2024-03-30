@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup environment
-        uses: /.github/actions/common
+        uses: ./.github/actions/common
 
       - name: Pull DVC
         run: |
