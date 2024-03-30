@@ -250,3 +250,11 @@ The model can be served using `BentoML`. This library allows the data practition
 ### CI/CD
 
 The actual `CI/CD` runs in `GitHub Actions`, a demanding task such as the `stress-test` is running there, which is not ideal. Then, would be nice to have a `dev` or `test` environment to carry out all tests and deploy in this environment before deploying to `production`.
+
+## References
+
+- [BentoML](https://docs.bentoml.org/en/latest/)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [MLFlow](https://mlflow.org/)
+- [DVC](https://dvc.org/)
+- [GitHub Actions](https://docs.github.com/en/actions)
