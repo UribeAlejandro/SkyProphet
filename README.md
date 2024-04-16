@@ -1,125 +1,260 @@
-# Software Engineer (ML & LLMs) Challenge
+# Sky Prophet <!-- omit in toc -->
 
 [![Continuous Integration](https://github.com/UribeAlejandro/SkyProphet/actions/workflows/ci.yml/badge.svg)](https://github.com/UribeAlejandro/SkyProphet/actions/workflows/ci.yml)
 
 [![Continuous Delivery](https://github.com/UribeAlejandro/SkyProphet/actions/workflows/cd.yml/badge.svg)](https://github.com/UribeAlejandro/SkyProphet/actions/workflows/cd.yml)
 
-## Overview
+The goal of the project is to build a build, test & serve a Machine Learning model able to predict the likelihood of flight delays.
 
-Welcome to the **Software Engineer (ML & LLMs)** Application Challenge. In this, you will have the opportunity to get closer to a part of the reality of the role, and demonstrate your skills and knowledge in machine learning and cloud.
+## Table of Contents <!-- omit in toc -->
 
-## Problem
+- [Architecture](#architecture)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Test](#test)
+- [Data](#data)
+  - [Data Version Control](#data-version-control)
+  - [Extract, transform, load](#extract-transform-load)
+- [Model](#model)
+  - [Experiments](#experiments)
+    - [Tracking \& Registry](#tracking--registry)
+    - [Serving](#serving)
+- [Deployment](#deployment)
+- [Nice Things to Have](#nice-things-to-have)
+  - [Monitoring](#monitoring)
+  - [Feature Store](#feature-store)
+  - [BentoML](#bentoml)
+  - [CI/CD](#cicd)
 
-A jupyter notebook (`exploration.ipynb`) has been provided with the work of a Data Scientist (from now on, the DS). The DS, trained a model to predict the probability of **delay** for a flight taking off or landing at SCL airport. The model was trained with public and real data, below we provide you with the description of the dataset:
+## Architecture
 
-| Column      | Description                                     |
-| ----------- | ----------------------------------------------- |
-| `Fecha-I`   | Scheduled date and time of the flight.          |
-| `Vlo-I`     | Scheduled flight number.                        |
-| `Ori-I`     | Programmed origin city code.                    |
-| `Des-I`     | Programmed destination city code.               |
-| `Emp-I`     | Scheduled flight airline code.                  |
-| `Fecha-O`   | Date and time of flight operation.              |
-| `Vlo-O`     | Flight operation number of the flight.          |
-| `Ori-O`     | Operation origin city code.                     |
-| `Des-O`     | Operation destination city code.                |
-| `Emp-O`     | Airline code of the operated flight.            |
-| `DIA`       | Day of the month of flight operation.           |
-| `MES`       | Number of the month of operation of the flight. |
-| `AÑO`       | Year of flight operation.                       |
-| `DIANOM`    | Day of the week of flight operation.            |
-| `TIPOVUELO` | Type of flight, I =International, N =National.  |
-| `OPERA`     | Name of the airline that operates.              |
-| `SIGLAORI`  | Name city of origin.                            |
-| `SIGLADES`  | Destination city name.                          |
+The architecture of the project is shown below:
 
-In addition, the DS considered relevant the creation of the following columns:
+![Architecture](img/SkyProphet-Architecture.drawio.svg)
 
-| Column        | Description                                                                                                                  |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `high_season` | 1 if `Date-I` is between Dec-15 and Mar-3, or Jul-15 and Jul-31, or Sep-11 and Sep-30, 0 otherwise.                          |
-| `min_diff`    | difference in minutes between `Date-O` and `Date-I`                                                                          |
-| `period_day`  | morning (between 5:00 and 11:59), afternoon (between 12:00 and 18:59) and night (between 19:00 and 4:59), based on `Date-I`. |
-| `delay`       | 1 if `min_diff` > 15, 0 if not.                                                                                              |
+## Installation
 
-## Challenge
+To install the project, you need to clone the repository and install the dependencies. To install the dependencies, you need to run the following command:
 
-### Instructions
+```bash
+make install
+```
 
-1. Create a repository in **github** and copy all the challenge content into it. Remember that the repository must be **public**.
+## Usage
 
-2. Use the **main** branch for any official release that we should review. It is highly recommended to use [GitFlow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) development practices. **NOTE: do not delete your development branches.**
+To run the server locally you need to run the following command:
 
-3. Please, do not change the structure of the challenge (names of folders and files).
+```bash
+make run-server
+```
 
-4. All the documentation and explanations that you have to give us must go in the `challenge.md` file inside `docs` folder.
+> **Note:** The following steps require a `.env` file or the environment variables (`MLFLOW_TRACKING_URI`
+and `MLFLOW_EXPERIMENT_NAME`) to be set before running the commands. Otherwise, the commands will fail.
 
-5. To send your challenge, you must do a `POST` request to:
-    `https://advana-challenge-check-api-cr-k4hdbggvoq-uc.a.run.app/software-engineer`
-    This is an example of the `body` you must send:
-    ```json
-    {
-      "name": "Juan Perez",
-      "mail": "juan.perez@example.com",
-      "github_url": "https://github.com/juanperez/latam-challenge.git",
-      "api_url": "https://juan-perez.api"
-    }
-    ```
-    ##### ***PLEASE, SEND THE REQUEST ONCE.***
+To run the server using docker you need to run the following command:
 
-    If your request was successful, you will receive this message:
-    ```json
-    {
-      "status": "OK",
-      "detail": "your request was received"
-    }
-    ```
+```bash
+docker-compose build
+docker-compose up -d
+```
+
+You should be able to access the server at `http://localhost:8000`. The documentation of the API is available at `http://localhost:8000/docs`.
+
+The `/docs` route is shown below:
+
+![Docs](img/FastAPI-Docs.png)
+
+You can access the logs of the server using the following command:
+
+```bash
+docker-compose logs api
+```
+
+You should get an output similar to the following:
+
+```bash
+api-1  | INFO:     Will watch for changes in these directories: ['/']
+api-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+api-1  | INFO:     Started reloader process [1] using StatReload
+api-1  | INFO:     Started server process [8]
+api-1  | INFO:     Waiting for application startup.
+api-1  | INFO:     Starting up...
+api-1  | INFO:     Application startup complete.
+api-1  | INFO:     192.168.65.1:18205 - "GET /docs HTTP/1.1" 200 OK
+api-1  | INFO:     192.168.65.1:18205 - "GET /openapi.json HTTP/1.1" 200 OK
+```
+
+To stop the server you need to run the following command:
+
+```bash
+docker-compose down -v
+```
+
+## Test
+
+There are three types of tests in the project:
+- `API test`: tests all the endpoints of the API.
+- `Model test`: tests the model using a sample dataset.
+- `Stress test`: tests the performance of the server.
+
+You can run the tests using the following commands:
+
+```bash
+make api-test
+make model-test
+make stress-test
+```
+
+Once finished you can see the results of the test within the reports' folder. You will find: `reports/coverage/index.html` and `reports/stress/index.html`.
+
+The reports can be downloaded from the `Actions` page of the repo:
+
+![Reports](img/Reports.png)
+
+## Data
+
+The data is stored in the `datasets` folder. The data is stored in the following format:
+
+```
+datasets
+├── test
+│   └── ...
+├── raw
+│   └── ...
+├── interim
+│   └── ...
+└── processed
+    └── ...
+```
+
+The `raw` folder contains the raw data. The `interim` folder contains the data after it has been cleaned. The `processed` folder contains the data after it has been processed and is ready for use in a model. The `test` folder contains the data used for testing.
 
 
-***NOTE: We recommend to send the challenge even if you didn't manage to finish all the parts.***
+### Data Version Control
 
-### Context:
+The data is versioned using `DVC`. The data is stored in a remote GCP bucket. It works like git, its commands are similar. For instance, the data stored in `datasets` can be added using the following command:
 
-We need to operationalize the data science work for the airport team. For this, we have decided to enable an `API` in which they can consult the delay prediction of a flight.
+```bash
+dvc add data/
+```
 
-*We recommend reading the entire challenge (all its parts) before you start developing.*
+Then, the data can be pushed to remote using the following command:
 
-### Part I
+```bash
+dvc push
+```
 
-In order to operationalize the model, transcribe the `.ipynb` file into the `model.py` file:
+The data can be pulled from remote using the following command:
 
-- If you find any bug, fix it.
-- The DS proposed a few models in the end. Choose the best model at your discretion, argue why. **It is not necessary to make improvements to the model.**
-- Apply all the good programming practices that you consider necessary in this item.
-- The model should pass the tests by running `make model-test`.
+```bash
+dvc pull
+```
 
-> **Note:**
-> - **You cannot** remove or change the name or arguments of **provided** methods.
-> - **You can** change/complete the implementation of the provided methods.
-> - **You can** create the extra classes and methods you deem necessary.
+### Extract, transform, load
 
-### Part II
+The ETL process consists of the following steps:
 
-Deploy the model in an `API` with `FastAPI` using the `api.py` file.
+- `extract`: Reads the file `data/raw/data.csv`.
+- `transform`: Cleans the data and generates features.
+- `load`: Saves the data in `data/processed/data.csv`.
 
-- The `API` should pass the tests by running `make api-test`.
+## Model
 
-> **Note:**
-> - **You cannot** use other framework.
+### Experiments
 
-### Part III
+All the experiments were tracked using `MLFlow`, the tracking server runs in a `GCP VM`, that stores the artifacts (model, confusion matrix, etc) in a `GCP bucket` and the `registry` (metrics, parameters, registered models, etc) in a `PostgreSQL` database that is hosted in `Cloud SQL`. A diagram of the architecture is shown below:
 
-Deploy the `API` in your favorite cloud provider (we recomend to use GCP).
+![Experiments](img/SkyProphet-Experiments.drawio.svg)
 
-- Put the `API`'s url in the `Makefile` (`line 26`).
-- The `API` should pass the tests by running `make stress-test`.
+As mentioned above, were tracked using `MLFlow`. The tracking server can be started using the following command:
 
-> **Note:**
-> - **It is important that the API is deployed until we review the tests.**
+```bash
+mlflow server --backend-store-uri $BACKEND_STORE_URI --default-artifact-root $DEFAULT_ARTIFACT_ROOT  --host 0.0.0 --port 5000
+```
 
-### Part IV
+> Note: You should SSH the `GCP VM` to run the command.
 
-We are looking for a proper `CI/CD` implementation for this development.
+#### Tracking & Registry
 
-- Create a new folder called `.github` and copy the `workflows` folder that we provided inside it.
-- Complete both `ci.yml` and `cd.yml`(consider what you did in the previous parts).
+The `MLFlow` server allows the data practitioner to track the experiments and register the models. An example of the experiments is shown below:
+
+![Experiments](img/Experiments.png)
+
+Once, the model is trained, it can be registered in the `MLFlow` registry. An example of the registry is shown below:
+
+![Registry](img/Registry.gif)
+
+> **Note**: In this case, `capable-ant-951` has been selected as the best model. Because has the highest `F1-score`, `ROC AUC` & `Recall` .
+
+
+#### Serving
+
+The model is served using `FastAPI`. The model can be served using the following command:
+
+```bash
+make run-server
+```
+
+The api has the following endpoints:
+
+- `/`: (GET) Greets the user.
+- `/predict`: (POST) Predicts the likelihood of a flight delay.
+- `/docs`: (GET) Shows the documentation of the API.
+- `/health`: (GET) Checks the health of the server.
+- `/ping`: (GET) Pings the server.
+
+## Deployment
+
+The deployment of the project is done using `GitHub Actions`. The deployment process consists of the following steps:
+
+- `Continuous Integration`
+  - `Build`: Install the dependencies & enforces code style.
+  - `Test`: Runs the tests of the project.
+- `Continuous Delivery`
+  - `Staging`: Build the docker image and push it to the `Container Registry` & `Artifact Regidstry`.
+  - `Deploy`: Deploys the created docker image to `GCP Cloud Run` using `Docker`.
+
+The deployed application is shown below:
+
+![Deployment](img/SkyProphet-Deployment.drawio.svg)
+
+> **Note:** The model that runs in the `GCP Cloud Run` is the one that has the best performance in the `MLFlow` registry. However, it is not static. Because it is retrieved from the `MLFlow` registry, it can be updated with a new model that has better performance without the need to redeploy the application. The good news is: The model retieval is cached, so the performance of the application is not affected!
+
+An example of a model promotion is shown below:
+
+![Model Promotion](img/Model-Promoted.png)
+
+> **Note**: The model with the `production` alias is the one that is retrieved by the `GCP Cloud Run`.
+
+## Nice Things to Have
+
+### Monitoring
+
+The monitoring of `SkyProphet` can be done using an adversarial approach. Thus, a second model `adversarial validator` is trained to detect the drift in the data. The architecture of the monitoring system is shown below:
+
+![Monitoring](img/SkyProphet-Monitoring.drawio.svg)
+
+### Feature Store
+
+The model was trained offline and once in production handles online features. It would be nice to have a `Feature Store` to handle the features in production. The workaround that has been implemented partially solves the problem by enforcing the input data to have the same features as the training data. However, it is not ideal because it can get harder to maintain the features in the future.
+
+### BentoML
+
+The model can be served using `BentoML`. This library allows the data practitioner to create a model server that can be deployed in different platforms. It is a grea option because it:
+
+- Make the FastAPI endpoints automatically.
+- Dockerizes the application.
+- Provides the infrastructure as code to depoy the model in different platforms.
+
+
+### CI/CD
+
+The actual `CI/CD` runs in `GitHub Actions`, a demanding task such as the `stress-test` is running there, which is not ideal. Then, would be nice to have a `dev` or `test` environment to carry out all tests and deploy in this environment before deploying to `production`.
+
+## References
+
+- [BentoML](https://docs.bentoml.org/en/latest/)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [MLFlow](https://mlflow.org/)
+- [DVC](https://dvc.org/)
+- [GitHub Actions](https://docs.github.com/en/actions)
